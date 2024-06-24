@@ -99,6 +99,33 @@ pub use self::{
 	runner::{Runner, RunnerError},
 };
 
+#[cfg(feature = "dbc-adaptor")]
+pub const CHAINS_VALUE_ADAPTOR: u128 = 1000;
+
+pub fn dbc_value_expand(origin: U256) -> U256 {
+	#[cfg(feature = "dbc-adaptor")]
+	{
+		origin.saturating_mul(U256::from(CHAINS_VALUE_ADAPTOR))
+	}
+	#[cfg(not(feature = "dbc-adaptor"))]
+	{
+		origin
+	}
+}
+
+pub fn dbc_value_shrink(origin: U256) -> U256 {
+	#[cfg(feature = "dbc-adaptor")]
+	{
+		origin
+			.checked_div(U256::from(CHAINS_VALUE_ADAPTOR))
+			.expect("divisor is non-zero; qed")
+	}
+	#[cfg(not(feature = "dbc-adaptor"))]
+	{
+		origin
+	}
+}
+
 #[frame_support::pallet]
 pub mod pallet {
 	use super::*;
@@ -743,7 +770,9 @@ impl<T: Config> Pallet<T> {
 		(
 			Account {
 				nonce: U256::from(UniqueSaturatedInto::<u128>::unique_saturated_into(nonce)),
-				balance: U256::from(UniqueSaturatedInto::<u128>::unique_saturated_into(balance)),
+				balance: dbc_value_expand(U256::from(
+					UniqueSaturatedInto::<u128>::unique_saturated_into(balance),
+				)),
 			},
 			T::DbWeight::get().reads(2),
 		)
