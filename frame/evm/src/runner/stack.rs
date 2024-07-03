@@ -17,10 +17,12 @@
 
 //! EVM stack-based runner.
 
+#[cfg(feature = "dbc-adaptor")]
+use crate::dbc_value_shrink;
 use crate::{
 	runner::Runner as RunnerT, AccountCodes, AccountStorages, AddressMapping, BalanceOf,
 	BlockHashMapping, Config, Error, Event, FeeCalculator, OnChargeEVMTransaction, OnCreate,
-	Pallet, RunnerError, dbc_value_shrink, dbc_value_expand
+	Pallet, RunnerError,
 };
 use evm::{
 	backend::Backend as BackendT,
