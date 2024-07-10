@@ -19,8 +19,8 @@
 1. What is MateMask and how to install and so on:
    https://support.metamask.io/getting-started/getting-started-with-metamask/
 
-2. How to add custom token to MateMask wallet:
-   https://support.metamask.io/managing-my-tokens/custom-tokens/how-to-add-a-custom-token-to-metamask/
+2. How to add a custom network RPC:
+   https://support.metamask.io/networks-and-sidechains/managing-networks/how-to-add-a-custom-network-rpc/
 
-3. How to display tokens in MateMask:
+3. How to display tokens:
    https://support.metamask.io/managing-my-tokens/custom-tokens/how-to-display-tokens-in-metamask/
