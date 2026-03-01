@@ -24,6 +24,8 @@ use alloc::{
 };
 use core::{marker::PhantomData, mem};
 use ethereum::AuthorizationList;
+#[cfg(feature = "dbc-adaptor")]
+use crate::dbc_value_shrink;
 use evm::{
 	backend::Backend as BackendT,
 	executor::stack::{Accessed, StackExecutor, StackState as StackStateT, StackSubstateMetadata},
@@ -280,7 +282,7 @@ where
 				})?;
 
 		// Deduct fee from the `source` account. Returns `None` if `total_fee` is Zero.
-		let fee = T::OnChargeTransaction::withdraw_fee(&source, total_fee)
+		let fee = T::OnChargeTransaction::withdraw_fee(&source, dbc_value_shrink(total_fee))
 			.map_err(|e| RunnerError { error: e, weight })?;
 
 		let vicinity = Vicinity {
@@ -398,9 +400,9 @@ where
 		let actual_priority_fee = T::OnChargeTransaction::correct_and_deposit_fee(
 			&source,
 			// Actual fee after evm execution, including tip.
-			actual_fee,
+			dbc_value_shrink(actual_fee),
 			// Base fee.
-			actual_base_fee,
+			dbc_value_shrink(actual_base_fee),
 			// Fee initially withdrawn.
 			fee,
 		);
@@ -1278,13 +1280,13 @@ where
 	fn transfer(&mut self, transfer: Transfer) -> Result<(), ExitError> {
 		let source = T::AddressMapping::into_account_id(transfer.source);
 		let target = T::AddressMapping::into_account_id(transfer.target);
+
+		let value = dbc_value_shrink(transfer.value);
+
 		T::Currency::transfer(
 			&source,
 			&target,
-			transfer
-				.value
-				.try_into()
-				.map_err(|_| ExitError::OutOfFund)?,
+			value.try_into().map_err(|_| ExitError::OutOfFund)?,
 			ExistenceRequirement::AllowDeath,
 		)
 		.map_err(|_| ExitError::OutOfFund)
