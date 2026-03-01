@@ -24,7 +24,6 @@ use alloc::{
 };
 use core::{marker::PhantomData, mem};
 use ethereum::AuthorizationList;
-#[cfg(feature = "dbc-adaptor")]
 use crate::dbc_value_shrink;
 use evm::{
 	backend::Backend as BackendT,
