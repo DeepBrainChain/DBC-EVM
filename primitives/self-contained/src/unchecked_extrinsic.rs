@@ -63,8 +63,13 @@ impl<Address, Call, Signature, Extension> UncheckedExtrinsic<Address, Call, Sign
 	}
 
 	/// New instance of an unsigned extrinsic aka "inherent".
+	///
+	/// DBC: encoded with the legacy extrinsic format version 4 (not 5), so that
+	/// block decoders that predate extrinsic v5 (older polkadot.js, gsrpc,
+	/// exchange and wallet integrations) keep decoding blocks. The runtime
+	/// accepts both versions.
 	pub fn new_bare(function: Call) -> Self {
-		Self(generic::UncheckedExtrinsic::new_bare(function))
+		Self(generic::UncheckedExtrinsic::new_bare_legacy(function))
 	}
 }
 
@@ -248,7 +253,8 @@ where
 	Extension: TypeInfo,
 {
 	fn new_inherent(call: Self::Call) -> Self {
-		generic::UncheckedExtrinsic::new_bare(call).into()
+		// DBC: legacy format version 4, see `new_bare`.
+		generic::UncheckedExtrinsic::new_bare_legacy(call).into()
 	}
 }
 
